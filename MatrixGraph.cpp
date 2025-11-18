@@ -1,34 +1,77 @@
 #include "MatrixGraph.h"
+
 #include <iostream>
-#include <vector>
 #include <string>
+#include <vector>
 
-MatrixGraph::MatrixGraph(bool type, int size) : Graph(type, size)
-{
-
+MatrixGraph::MatrixGraph(bool type, int size) : Graph(type, size) {
+    this->m_Mat = new int*[size];
+    for (int i = 0; i < size; i++) {
+        this->m_Mat[i] = new int[size]();
+    }
 }
 
-MatrixGraph::~MatrixGraph()
-{
+MatrixGraph::~MatrixGraph() {
+    for (int i = 0; i < this->getSize(); i++) {
+        delete[] this->m_Mat[i];
+    }
 
+    delete[] this->m_Mat;
 }
 
-void MatrixGraph::getAdjacentEdges(int vertex, map<int, int>* m)
-{	
+void MatrixGraph::getAdjacentEdges(int vertex, map<int, int>* m) {
+    m->clear();
 
+    for (int i = 0; i < this->getSize(); i++) {
+        if (this->m_Mat[vertex][i] == 0) {
+            continue;
+        }
+        int to = i;
+        int weight = this->m_Mat[vertex][i];
+
+        (*m)[to] = weight;
+    }
 }
 
-void MatrixGraph::getAdjacentEdgesDirect(int vertex, map<int, int>* m)
-{
-	
+void MatrixGraph::getAdjacentEdgesDirect(int vertex, map<int, int>* m) {
+    m->clear();
+
+    for (int i = 0; i < this->getSize(); i++) {
+        if (this->m_Mat[vertex][i] == 0) {
+            continue;
+        }
+        int to = i;
+        int weight = this->m_Mat[vertex][i];
+
+        (*m)[to] = weight;
+    }
 }
 
-void MatrixGraph::insertEdge(int from, int to, int weight)	
-{
-	
+void MatrixGraph::insertEdge(int from, int to, int weight) {
+    this->m_Mat[from][to] = weight;
 }
 
-bool MatrixGraph::printGraph(ofstream *fout)	
-{
-	
+bool MatrixGraph::printGraph(ofstream* fout) {
+    if (this->m_Mat == nullptr) {
+        return false;
+    }
+
+    (*fout) << "========PRINT========\n"
+            << "    ";
+
+    for (int i = 0; i < getSize(); i++) {
+        (*fout) << ' [' << i << '] ';
+    }
+    (*fout) << '\n';
+
+    for (int row = 0; row < getSize(); row++) {
+        (*fout) << ' [' << row << '] ';
+        for (int col = 0; col < getSize(); col++) {
+            (*fout) << " " << this->m_Mat[row][col] << "  ";
+        }
+        (*fout) << '\n';
+    }
+    (*fout) << "=======================\n\n";
+
+    return true;
 }

@@ -3,20 +3,19 @@
 
 #include "Graph.h"
 
-class ListGraph : public Graph{	
-private:
-	map < int, int >* m_List;
-	vector<int>* kw_graph;
-	
-public:	
-	ListGraph(bool type, int size);
-	~ListGraph();
-		
-	void getAdjacentEdges(int vertex, map<int, int>* m);	
-	void getAdjacentEdgesDirect(int vertex, map<int, int>* m);
-	void insertEdge(int from, int to, int weight);	
-	bool printGraph(ofstream *fout);
+class ListGraph : public Graph {
+   private:
+    map<int, int>* m_List;  // m_List[from][to] = weight
+    vector<int>* kw_graph;  // kw_graph[from].push_back(to)
 
+   public:
+    ListGraph(bool type, int size);
+    ~ListGraph();
+
+    void getAdjacentEdges(int vertex, map<int, int>* m);
+    void getAdjacentEdgesDirect(int vertex, map<int, int>* m);
+    void insertEdge(int from, int to, int weight);
+    bool printGraph(ofstream* fout);
 };
 
 #endif

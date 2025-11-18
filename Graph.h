@@ -1,37 +1,46 @@
 #ifndef _GRAPH_H_
 #define _GRAPH_H_
 
-#include <iostream>
-#include <cstring>
-#include <string.h>
-#include <fstream>
-#include <map>
-#include <set>
 #include <math.h>
-#include <vector>
+#include <string.h>
+
 #include <algorithm>
+#include <cstring>
 #include <deque>
+#include <fstream>
+#include <iostream>
+#include <map>
 #include <queue>
+#include <set>
 #include <stack>
+#include <vector>
 
 using namespace std;
 
-class Graph{	
-protected:
-	bool m_Type;
-	int m_Size;
+class Graph {
+   protected:
+    bool m_Type;
+    int m_Size;
 
-public:
-	Graph(bool type, int size);
-	virtual ~Graph();
+   public:
+    Graph(bool type, int size);
+    virtual ~Graph();
 
-	bool getType();	
-	int getSize();
+    // True if the graph exists. If true, free the graph memory.
+    bool getType() {
+        return this->m_Type;
+    }
+    int getSize() {
+        return this->m_Size;
+    }
 
-	virtual void getAdjacentEdges(int vertex, map<int, int>* m) = 0;		
-	virtual void getAdjacentEdgesDirect(int vertex, map<int, int>* m) = 0;	
-	virtual void insertEdge(int from, int to, int weight) = 0;				
-	virtual	bool printGraph(ofstream *fout) = 0;
+    // A function that transmits information about the neighboring nodes of the current node
+    // during graph operations.
+    virtual void getAdjacentEdges(int vertex, map<int, int>* m) = 0;
+    virtual void getAdjacentEdgesDirect(int vertex, map<int, int>* m) = 0;
+
+    virtual void insertEdge(int from, int to, int weight) = 0;
+    virtual bool printGraph(ofstream* fout) = 0;
 };
 
 #endif
