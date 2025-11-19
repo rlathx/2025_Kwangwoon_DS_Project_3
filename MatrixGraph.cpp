@@ -22,14 +22,19 @@ MatrixGraph::~MatrixGraph() {
 void MatrixGraph::getAdjacentEdges(int vertex, map<int, int>* m) {
     m->clear();
 
-    for (int i = 0; i < this->getSize(); i++) {
-        if (this->m_Mat[vertex][i] == 0) {
+    for (int u = 0; u < this->getSize(); u++) {
+        if (u == vertex) {
             continue;
         }
-        int to = i;
-        int weight = this->m_Mat[vertex][i];
+        int weight1 = this->m_Mat[vertex][u];  // out edges
+        int weight2 = this->m_Mat[u][vertex];  // in edges
 
-        (*m)[to] = weight;
+        if (weight1 != 0) {
+            (*m)[u] = weight1;
+        }
+        if (weight2 != 0) {
+            (*m)[u] = weight2;
+        }
     }
 }
 

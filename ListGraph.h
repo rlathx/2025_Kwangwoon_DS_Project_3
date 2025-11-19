@@ -6,7 +6,6 @@
 class ListGraph : public Graph {
    private:
     map<int, int>* m_List;  // m_List[from][to] = weight
-    vector<int>* kw_graph;  // kw_graph[from].push_back(to)
 
    public:
     ListGraph(bool type, int size);

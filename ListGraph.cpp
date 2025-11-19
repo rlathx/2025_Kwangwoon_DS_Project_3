@@ -5,24 +5,31 @@
 
 ListGraph::ListGraph(bool type, int size) : Graph(type, size) {
     this->m_List = new map<int, int>[size];
-    this->kw_graph = new vector<int>[size];
 }
 
 ListGraph::~ListGraph() {
     delete[] this->m_List;
-    delete[] this->kw_graph;
 }
 
 void ListGraph::getAdjacentEdges(
     int vertex, map<int, int>* m)  // Definition of getAdjacentEdges(No Direction == Undirected)
 {
     m->clear();
-    if (this->m_List[vertex].empty()) return;
 
+    // 1. out edges
     for (auto& p : this->m_List[vertex]) {
         int to = p.first;
         int weight = p.second;
         (*m)[to] = weight;
+    }
+
+    // 2. in edges
+    for (int u = 0; u < getSize(); u++) {
+        if (u == vertex) continue;
+        auto it = this->m_List[u].find(vertex);
+        if (it != this->m_List[u].end()) {
+            (*m)[u] = it->second;
+        }
     }
 }
 
@@ -44,12 +51,11 @@ void ListGraph::getAdjacentEdgesDirect(
 void ListGraph::insertEdge(int from, int to, int weight)  // Definition of insertEdge
 {
     this->m_List[from][to] = weight;
-    this->kw_graph[from].push_back(to);
 }
 
 bool ListGraph::printGraph(ofstream* fout)  // Definition of print Graph
 {
-    if (this->m_List == nullptr || this->kw_graph == nullptr) {
+    if (this->m_List == nullptr) {
         return false;
     }
 
