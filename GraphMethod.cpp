@@ -39,7 +39,7 @@ vector<vector<pair<int, int>>> Kruskal(Graph* graph) {
         // i: start vertex
         // it->first: end vertex
         // it->second: weight
-        for (auto it = m.begin(); it != m.end(); ++it) {
+        for (auto it = m.begin(); it != m.end(); it++) {
             int end = it->first;
             int weight = it->second;
 
@@ -97,7 +97,94 @@ vector<vector<pair<int, int>>> Kruskal(Graph* graph) {
     return kruskal;
 }
 
-bool Dijkstra(Graph* graph, char option, int vertex) {
+vector<pair<vector<int>, int>> Dijkstra(Graph* graph, char option,
+                                        int vertex) {  // vertex: start node
+    // Graph does not exist
+    if (graph == nullptr) {
+        return {};
+    }
+
+    // Non-existent vertex
+    if (vertex < 0 || vertex >= graph->getSize()) {
+        return {};
+    }
+
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>>
+        pq;                                       // first: weight, second: vertex
+    vector<bool> visit(graph->getSize(), false);  // Visit check
+    int inf = 2147483647;                         // int maximum value == infinity
+    vector<int> cost(graph->getSize(), inf);      // cost
+    vector<int> parent(graph->getSize(), -1);     // For recording the previous peak
+
+    vector<pair<vector<int>, int>> visitNodeKList(graph->getSize());  // Shortest path, cost
+
+    map<int, int> m;  // to, weight
+
+    cost[vertex] = 0;
+    pq.push({0, vertex});
+
+    while (!pq.empty()) {
+        // 1. cur settings
+        // top vertex of priority_queue == cur
+        auto curCost = pq.top().first;
+        auto cur = pq.top().second;
+        pq.pop();
+
+        if (visit[cur]) continue;
+        visit[cur] = true;
+
+        // Option branch
+        if (option == 'O') {
+            graph->getAdjacentEdgesDirect(cur, &m);
+        } else if (option == 'X') {
+            graph->getAdjacentEdges(cur, &m);
+        } else {
+            // Non-existent option
+            return {};
+        }
+
+        for (auto it = m.begin(); it != m.end(); it++) {
+            int end = it->first;
+            int weight = it->second;
+
+            // Major premise: There are no zero weights.
+            // Dijkstra: Negative weights are not allowed.
+            if (weight <= 0) {
+                return {};
+            }
+
+            // 2. Cost update according to newly selected cur
+            int nextCost = curCost + weight;
+            if (nextCost < cost[end]) {
+                cost[end] = nextCost;
+                parent[end] = cur;  // The previous vertex on the shortest path to end is cur
+                pq.push({nextCost, end});
+            }
+        }
+    }
+
+    // 3. Save final results
+    for (int v = 0; v < graph->getSize(); v++) {
+        vector<int> temp;
+
+        if (cost[v] == inf) {
+            // unreachable peak
+            visitNodeKList[v] = {temp, -1};  // If the cost in Manager is -1, output x
+            continue;
+        }
+
+        // Collect the path backwards along the parent to v
+        int cur = v;
+        while (cur != -1) {
+            temp.push_back(cur);
+            cur = parent[cur];
+        }
+        reverse(temp.begin(), temp.end());
+
+        visitNodeKList[v] = {temp, cost[v]};
+    }
+
+    return visitNodeKList;
 }
 
 bool Bellmanford(Graph* graph, char option, int s_vertex, int e_vertex) {

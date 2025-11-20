@@ -57,13 +57,26 @@ void Manager::run(const char* command_txt) {
         if (cmd == "DFS") {
         }
         if (cmd == "KRUSKAL") {
-            if (this->mKRUSKAL()) {
-                this->fout << "========KRUSKAL========";
-                this->fout << "=======================";
+            if (!this->mKRUSKAL()) {
+                this->printErrorCode(500);
             }
             continue;
         }
         if (cmd == "DIJKSTRA") {
+            char option = '\0';
+            int vertex = -1;
+
+            commandSS >> option >> vertex;
+
+            if ((option != 'O' && option != 'X') || (vertex == -1)) {
+                this->printErrorCode(600);
+                continue;
+            }
+
+            if (!this->mDIJKSTRA(option, vertex)) {
+                this->printErrorCode(600);
+            }
+            continue;
         }
         if (cmd == "BELLMANFORD") {
         }
@@ -189,12 +202,82 @@ bool Manager::mDFS(char option, int vertex) {
 }
 
 bool Manager::mKRUSKAL() {
-    this->printErrorCode(500);
-    return false;
+    vector<vector<pair<int, int>>> kruskal = Kruskal(this->graph);
+
+    // error1: No graph
+    if (kruskal.size() == 0) {
+        return false;
+    }
+
+    // error2: If there are inaccessible vertices
+    for (int i = 0; i < this->graph->getSize(); i++) {
+        if (kruskal[i].size() == 0) {
+            return false;
+        } else {
+            continue;
+        }
+    }
+
+    int cost = 0;
+    this->fout << "========KRUSKAL========\n";
+    for (int i = 0; i < this->graph->getSize(); i++) {
+        this->fout << ' [' << i << ']';
+        for (int j = 0; j < kruskal[i].size(); j++) {
+            int end = kruskal[i][j].first;
+            int weight = kruskal[i][j].second;
+            this->fout << ' ' << end << '(' << weight << ')';
+
+            // Add only once among undirected edges
+            if (i < end) {
+                cost += weight;
+            }
+        }
+        this->fout << '\n';
+    }
+    this->fout << "Cost: " << cost << '\n';
+    this->fout << "=======================\n\n";
+
+    return true;
 }
 
 bool Manager::mDIJKSTRA(char option, int vertex) {
-    this->printErrorCode(600);
+    vector<pair<vector<int>, int>> dijkstra = Dijkstra(this->graph, option, vertex);
+
+    if (dijkstra.size() == 0) {
+        return false;
+    }
+
+    this->fout << "========DIJKSTRA========\n";
+
+    if (option == 'O') {
+        this->fout << "Directed Graph Dijkstra\n";
+    } else if (option == 'X') {
+        this->fout << "Undirected Graph Dijkstra\n";
+    }
+
+    this->fout << "Start: " << vertex << '\n';
+
+    for (int v = 0; v < this->graph->getSize(); v++) {
+        this->fout << ' [' << v << '] ';
+
+        if (dijkstra[v].second == -1) {
+            this->fout << " x\n";
+            continue;
+        }
+
+        for (int i = 0; i < dijkstra[v].first.size(); i++) {
+            if (i > 0) {
+                this->fout << " -> ";
+            }
+            this->fout << dijkstra[v].first[i];
+        }
+
+        this->fout << " (" << dijkstra[v].second << ")\n";
+    }
+
+    this->fout << "=======================\n\n";
+
+    return true;
 }
 
 bool Manager::mBELLMANFORD(char option, int s_vertex, int e_vertex) {
