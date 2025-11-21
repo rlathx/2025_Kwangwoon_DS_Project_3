@@ -190,7 +190,77 @@ vector<pair<vector<int>, int>> Dijkstra(Graph* graph, char option,
 bool Bellmanford(Graph* graph, char option, int s_vertex, int e_vertex) {
 }
 
-bool FLOYD(Graph* graph, char option) {
+int** FLOYD(Graph* graph, char option) {
+    if (graph == nullptr) {
+        return nullptr;
+    }
+
+    int graphSeize = graph->getSize();
+    int inf = 2147483647;  // int maximum value == infinity
+    int** floyd = new int*[graphSeize];
+
+    // 1. Initialize the shortest distance table
+    for (int i = 0; i < graphSeize; i++) {
+        floyd[i] = new int[graphSeize];
+
+        for (int j = 0; j < graphSeize; j++) {
+            floyd[i][j] = inf;
+        }
+    }
+
+    map<int, int> m;  // to, weight
+
+    for (int i = 0; i < graphSeize; i++) {
+        floyd[i][i] = 0;
+
+        // Option branch
+        if (option == 'O') {
+            graph->getAdjacentEdgesDirect(i, &m);
+        } else if (option == 'X') {
+            graph->getAdjacentEdges(i, &m);
+        } else {
+            // Non-existent option
+            for (int i = 0; i < graphSeize; i++) {
+                delete[] floyd[i];
+            }
+            delete[] floyd;
+
+            return nullptr;
+        }
+
+        for (auto it = m.begin(); it != m.end(); it++) {
+            int end = it->first;
+            int weight = it->second;
+
+            floyd[i][end] = weight;
+        }
+    }
+
+    // 2. Update the table considering cases where a specific node is passed through
+    for (int v = 0; v < graphSeize; v++) {
+        for (int i = 0; i < graphSeize; i++) {
+            for (int j = 0; j < graphSeize; j++) {
+                if (floyd[i][v] == inf || floyd[v][j] == inf) {
+                    continue;
+                }
+
+                // Overflow prevention
+                long long temp = floyd[i][v] + floyd[v][j];
+                if (temp < floyd[i][j]) {
+                    floyd[i][j] = (int)temp;
+                }
+            }
+        }
+    }
+
+    // 3. Negative cycle check
+    for (int v = 0; v < graphSeize; v++) {
+        if (floyd[v][v] < 0) {
+            return nullptr;
+        }
+    }
+
+    return floyd;
 }
 
 bool Centrality(Graph* graph) {

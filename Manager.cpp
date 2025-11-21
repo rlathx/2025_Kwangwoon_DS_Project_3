@@ -51,6 +51,11 @@ void Manager::run(const char* command_txt) {
             }
         }
         if (cmd == "PRINT") {
+            if (!this->PRINT()) {
+                this->printErrorCode(200);
+            }
+
+            continue;
         }
         if (cmd == "BFS") {
         }
@@ -81,6 +86,19 @@ void Manager::run(const char* command_txt) {
         if (cmd == "BELLMANFORD") {
         }
         if (cmd == "FLOYD") {
+            char option = '\0';
+
+            commandSS >> option;
+
+            if (option != 'O' && option != 'X') {
+                this->printErrorCode(800);
+                continue;
+            }
+
+            if (!this->mFLOYD(option)) {
+                this->printErrorCode(800);
+            }
+            continue;
         }
         if (cmd == "CENTRALITY") {
         }
@@ -190,7 +208,11 @@ bool Manager::LOAD(const char* filename) {
 }
 
 bool Manager::PRINT() {
-    this->printErrorCode(200);
+    if (this->graph->printGraph(&this->fout)) {
+        return true;
+    }
+
+    return false;
 }
 
 bool Manager::mBFS(char option, int vertex) {
@@ -285,7 +307,47 @@ bool Manager::mBELLMANFORD(char option, int s_vertex, int e_vertex) {
 }
 
 bool Manager::mFLOYD(char option) {
-    this->printErrorCode(800);
+    int** floyd = FLOYD(this->graph, option);
+    int inf = 2147483647;
+
+    if (floyd == nullptr) {
+        return false;
+    }
+
+    this->fout << "========FLOYD========\n";
+
+    if (option == 'O') {
+        this->fout << "Directed Graph Floyd\n";
+    } else if (option == 'X') {
+        this->fout << "Undirected Graph Floyd\n";
+    }
+
+    this->fout << "    ";
+
+    for (int i = 0; i < this->graph->getSize(); i++) {
+        this->fout << ' [' << i << '] ';
+    }
+    this->fout << '\n';
+
+    for (int row = 0; row < this->graph->getSize(); row++) {
+        this->fout << ' [' << row << '] ';
+
+        for (int col = 0; col < this->graph->getSize(); col++) {
+            if (floyd[row][col] == inf) {
+                this->fout << " " << 'x' << "  ";
+            }
+            this->fout << " " << floyd[row][col] << "  ";
+        }
+        this->fout << '\n';
+    }
+    this->fout << "=======================\n\n";
+
+    for (int i = 0; i < this->graph->getSize(); i++) {
+        delete[] floyd[i];
+    }
+    delete[] floyd;
+
+    return true;
 }
 
 bool Manager::mCentrality() {
