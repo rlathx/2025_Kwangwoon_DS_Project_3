@@ -11,10 +11,100 @@
 
 using namespace std;
 
-bool BFS(Graph* graph, char option, int vertex) {
+vector<int> BFS(Graph* graph, char option, int vertex) {
+    // Graph does not exist
+    if (graph == nullptr) {
+        return {};
+    }
+
+    // Non-existent vertex
+    if (vertex < 0 || vertex >= graph->getSize()) {
+        return {};
+    }
+
+    queue<int> q;
+    vector<bool> visit(graph->getSize(), false);
+    vector<int> bfs;  // result
+
+    map<int, int> m;  // to, weight
+
+    q.push(vertex);
+
+    while (!q.empty()) {
+        int cur = q.front();
+        q.pop();
+
+        if (visit[cur] == true) {
+            continue;
+        }
+        visit[cur] = true;
+        bfs.push_back(cur);
+
+        // Option branch
+        if (option == 'O') {
+            graph->getAdjacentEdgesDirect(cur, &m);
+        } else if (option == 'X') {
+            graph->getAdjacentEdges(cur, &m);
+        } else {
+            // Non-existent option
+            return {};
+        }
+
+        for (auto it = m.rbegin(); it != m.rend(); it++) {
+            int end = it->first;
+            q.push(end);
+        }
+    }
+
+    return bfs;
 }
 
-bool DFS(Graph* graph, char option, int vertex) {
+vector<int> DFS(Graph* graph, char option, int vertex) {
+    // Graph does not exist
+    if (graph == nullptr) {
+        return {};
+    }
+
+    // Non-existent vertex
+    if (vertex < 0 || vertex >= graph->getSize()) {
+        return {};
+    }
+
+    vector<int> stack;
+    vector<bool> visit(graph->getSize(), false);
+    vector<int> dfs;  // result
+
+    map<int, int> m;  // to, weight
+
+    stack.push_back(vertex);
+
+    while (!stack.empty()) {
+        int cur = stack.back();
+        stack.pop_back();
+
+        if (visit[cur] == true) {
+            continue;
+        }
+        visit[cur] = true;
+        dfs.push_back(cur);
+
+        // Option branch
+        if (option == 'O') {
+            graph->getAdjacentEdgesDirect(cur, &m);
+        } else if (option == 'X') {
+            graph->getAdjacentEdges(cur, &m);
+        } else {
+            // Non-existent option
+            return {};
+        }
+
+        for (auto it = m.rbegin(); it != m.rend(); it++) {
+            int end = it->first;
+            stack.push_back(end);
+        }
+    }
+
+    return dfs;
 }
 
 vector<vector<pair<int, int>>> Kruskal(Graph* graph) {

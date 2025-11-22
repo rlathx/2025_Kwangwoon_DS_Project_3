@@ -58,8 +58,36 @@ void Manager::run(const char* command_txt) {
             continue;
         }
         if (cmd == "BFS") {
+            char option = '\0';
+            int vertex = -1;
+
+            commandSS >> option >> vertex;
+
+            if ((option != 'O' && option != 'X') || (vertex == -1)) {
+                this->printErrorCode(300);
+                continue;
+            }
+
+            if (!this->mBFS(option, vertex)) {
+                this->printErrorCode(300);
+            }
+            continue;
         }
         if (cmd == "DFS") {
+            char option = '\0';
+            int vertex = -1;
+
+            commandSS >> option >> vertex;
+
+            if ((option != 'O' && option != 'X') || (vertex == -1)) {
+                this->printErrorCode(400);
+                continue;
+            }
+
+            if (!this->mDFS(option, vertex)) {
+                this->printErrorCode(400);
+            }
+            continue;
         }
         if (cmd == "KRUSKAL") {
             if (!this->mKRUSKAL()) {
@@ -216,11 +244,65 @@ bool Manager::PRINT() {
 }
 
 bool Manager::mBFS(char option, int vertex) {
-    this->printErrorCode(300);
+    vector<int> bfs = BFS(this->graph, option, vertex);
+
+    if (bfs.size() == 0) {
+        return false;
+    }
+
+    this->fout << "========BFS========\n";
+
+    if (option == 'O') {
+        this->fout << "Directed Graph BFS\n";
+    } else if (option == 'X') {
+        this->fout << "Undirected Graph BFS\n";
+    }
+
+    this->fout << "Start: " << vertex << '\n';
+
+    for (int v = 0; v < bfs.size(); v++) {
+        if (v == 0) {
+            this->fout << bfs[v];
+            continue;
+        }
+
+        this->fout << " -> " << bfs[v];
+    }
+
+    this->fout << '\n' << "=======================\n\n";
+
+    return true;
 }
 
 bool Manager::mDFS(char option, int vertex) {
-    this->printErrorCode(400);
+    vector<int> dfs = DFS(this->graph, option, vertex);
+
+    if (dfs.size() == 0) {
+        return false;
+    }
+
+    this->fout << "========DFS========\n";
+
+    if (option == 'O') {
+        this->fout << "Directed Graph DFS\n";
+    } else if (option == 'X') {
+        this->fout << "Undirected Graph DFS\n";
+    }
+
+    this->fout << "Start: " << vertex << '\n';
+
+    for (int v = 0; v < dfs.size(); v++) {
+        if (v == 0) {
+            this->fout << dfs[v];
+            continue;
+        }
+
+        this->fout << " -> " << dfs[v];
+    }
+
+    this->fout << '\n' << "=======================\n\n";
+
+    return true;
 }
 
 bool Manager::mKRUSKAL() {
