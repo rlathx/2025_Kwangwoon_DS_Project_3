@@ -112,6 +112,21 @@ void Manager::run(const char* command_txt) {
             continue;
         }
         if (cmd == "BELLMANFORD") {
+            char option = '\0';
+            int start = -1;
+            int end = -1;
+
+            commandSS >> option >> start >> end;
+
+            if ((option != 'O' && option != 'X') || (start == -1) || (end == -1)) {
+                this->printErrorCode(700);
+                continue;
+            }
+
+            if (!this->mBELLMANFORD(option, start, end)) {
+                this->printErrorCode(700);
+            }
+            continue;
         }
         if (cmd == "FLOYD") {
             char option = '\0';
@@ -385,7 +400,33 @@ bool Manager::mDIJKSTRA(char option, int vertex) {
 }
 
 bool Manager::mBELLMANFORD(char option, int s_vertex, int e_vertex) {
-    this->printErrorCode(700);
+    vector<int> bellmanford = Bellmanford(this->graph, option, s_vertex, e_vertex);
+
+    if (bellmanford.size() == 0) {
+        return false;
+    }
+
+    this->fout << "========BELLMANFORD========\n";
+
+    if (option == 'O') {
+        this->fout << "Directed Graph Bellman-Ford\n";
+    } else if (option == 'X') {
+        this->fout << "Undirected Graph Bellman-Ford\n";
+    }
+
+    if ((bellmanford.size() == 1) && (bellmanford.back() == -1)) {
+        this->fout << "x\n";
+    } else {
+        this->fout << bellmanford[0];
+        for (int i = 1; i < bellmanford.size() - 1; i++) {
+            this->fout << " -> " << bellmanford[i];
+        }
+
+        this->fout << "\nCost: " << bellmanford.back() << "\n";
+    }
+    this->fout << "=======================\n\n";
+
+    return true;
 }
 
 bool Manager::mFLOYD(char option) {
