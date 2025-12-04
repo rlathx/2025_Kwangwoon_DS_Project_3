@@ -11,6 +11,8 @@
 
 using namespace std;
 
+int inf = 2147483647;  // int maximum value == infinity
+
 vector<int> BFS(Graph* graph, char option, int vertex) {
     // Graph does not exist
     if (graph == nullptr) {
@@ -202,7 +204,6 @@ vector<pair<vector<int>, int>> Dijkstra(Graph* graph, char option,
     priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>>
         pq;                                       // first: weight, second: vertex
     vector<bool> visit(graph->getSize(), false);  // Visit check
-    int inf = 2147483647;                         // int maximum value == infinity
     vector<int> cost(graph->getSize(), inf);      // cost
     vector<int> parent(graph->getSize(), -1);     // For recording the previous peak
 
@@ -277,7 +278,103 @@ vector<pair<vector<int>, int>> Dijkstra(Graph* graph, char option,
     return visitNodeKList;
 }
 
-bool Bellmanford(Graph* graph, char option, int s_vertex, int e_vertex) {
+vector<int> Bellmanford(Graph* graph, char option, int s_vertex, int e_vertex) {
+    // Graph does not exist
+    if (graph == nullptr) {
+        return {};
+    }
+
+    // Non-existent vertex
+    int graphSize = graph->getSize();
+
+    if (s_vertex < 0 || s_vertex >= graphSize) {
+        return {};
+    }
+    if (e_vertex < 0 || e_vertex >= graphSize) {
+        return {};
+    }
+
+    // 1. initialization
+    vector<int> bellmanford(graphSize, inf);
+    vector<int> parent(graphSize, -1);  // For parent storage like union-find
+
+    bellmanford[s_vertex] = 0;
+
+    // 2. bellmanford algorithm
+    map<int, int> m;  // to, weight
+
+    for (int i = 0; i < graphSize - 1; i++) {
+        // Check all edges every time
+        for (int j = 0; j < graphSize; j++) {
+            if (bellmanford[j] == inf) {
+                continue;
+            }
+
+            // Option branch
+            if (option == 'O') {
+                graph->getAdjacentEdgesDirect(j, &m);
+            } else if (option == 'X') {
+                graph->getAdjacentEdges(j, &m);
+            } else {
+                // Non-existent option
+                return {};
+            }
+
+            for (auto it = m.begin(); it != m.end(); it++) {
+                int end = it->first;
+                int weight = it->second;
+
+                if (bellmanford[end] > bellmanford[j] + weight) {
+                    bellmanford[end] = bellmanford[j] + weight;
+                    parent[end] = j;
+                }
+            }
+        }
+    }
+
+    // 3. Check for negative cycles
+    for (int j = 0; j < graphSize; j++) {
+        if (bellmanford[j] == inf) {
+            continue;
+        }
+
+        // Option branch
+        if (option == 'O') {
+            graph->getAdjacentEdgesDirect(j, &m);
+        } else if (option == 'X') {
+            graph->getAdjacentEdges(j, &m);
+        } else {
+            // Non-existent option
+            return {};
+        }
+
+        for (auto it = m.begin(); it != m.end(); it++) {
+            int end = it->first;
+            int weight = it->second;
+
+            if (bellmanford[end] > bellmanford[j] + weight) {
+                return {};
+            }
+        }
+    }
+
+    // 4. Restoring the path using the parent array (like union-find)
+    vector<int> result;
+
+    // If s_vertex is unreachable from e_vertex, return a vector containing only -1.
+    // If the vector's size is 1 and the top is -1, output x.
+    if (bellmanford[e_vertex] == inf) {
+        result.push_back(-1);
+        return result;
+    }
+
+    for (int i = e_vertex; i != -1; i = parent[i]) {
+        result.push_back(i);
+    }
+    reverse(result.begin(), result.end());
+    result.push_back(bellmanford[e_vertex]);
+
+    return result;
 }
 
 int** FLOYD(Graph* graph, char option) {
@@ -285,22 +382,21 @@ int** FLOYD(Graph* graph, char option) {
         return nullptr;
     }
 
-    int graphSeize = graph->getSize();
-    int inf = 2147483647;  // int maximum value == infinity
-    int** floyd = new int*[graphSeize];
+    int graphSize = graph->getSize();
+    int** floyd = new int*[graphSize];
 
     // 1. Initialize the shortest distance table
-    for (int i = 0; i < graphSeize; i++) {
-        floyd[i] = new int[graphSeize];
+    for (int i = 0; i < graphSize; i++) {
+        floyd[i] = new int[graphSize];
 
-        for (int j = 0; j < graphSeize; j++) {
+        for (int j = 0; j < graphSize; j++) {
             floyd[i][j] = inf;
         }
     }
 
     map<int, int> m;  // to, weight
 
-    for (int i = 0; i < graphSeize; i++) {
+    for (int i = 0; i < graphSize; i++) {
         floyd[i][i] = 0;
 
         // Option branch
@@ -310,7 +406,7 @@ int** FLOYD(Graph* graph, char option) {
             graph->getAdjacentEdges(i, &m);
         } else {
             // Non-existent option
-            for (int i = 0; i < graphSeize; i++) {
+            for (int i = 0; i < graphSize; i++) {
                 delete[] floyd[i];
             }
             delete[] floyd;
@@ -327,9 +423,9 @@ int** FLOYD(Graph* graph, char option) {
     }
 
     // 2. Update the table considering cases where a specific node is passed through
-    for (int v = 0; v < graphSeize; v++) {
-        for (int i = 0; i < graphSeize; i++) {
-            for (int j = 0; j < graphSeize; j++) {
+    for (int v = 0; v < graphSize; v++) {
+        for (int i = 0; i < graphSize; i++) {
+            for (int j = 0; j < graphSize; j++) {
                 if (floyd[i][v] == inf || floyd[v][j] == inf) {
                     continue;
                 }
@@ -344,7 +440,7 @@ int** FLOYD(Graph* graph, char option) {
     }
 
     // 3. Negative cycle check
-    for (int v = 0; v < graphSeize; v++) {
+    for (int v = 0; v < graphSize; v++) {
         if (floyd[v][v] < 0) {
             return nullptr;
         }
