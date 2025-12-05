@@ -11,7 +11,7 @@
 
 using namespace std;
 
-int inf = 2147483647;  // int maximum value == infinity
+const int inf = 2147483647;  // int maximum value == infinity
 
 vector<int> BFS(Graph* graph, char option, int vertex) {
     // Graph does not exist
@@ -449,5 +449,32 @@ int** FLOYD(Graph* graph, char option) {
     return floyd;
 }
 
-bool Centrality(Graph* graph) {
+vector<int> Centrality(Graph* graph) {
+    int** floyd = FLOYD(graph, 'X');
+
+    // If there is no graph or a negative cycle occurs during the shortest path calculation.
+    if (floyd == nullptr) {
+        return {};
+    }
+
+    // 1. initialization
+    int graphSize = graph->getSize();
+    vector<int> centrality(graphSize, 0);
+
+    // 2. The sum of the shortest path costs from all other vertices to that vertex.
+    for (int i = 0; i < graphSize; i++) {
+        for (int j = 0; j < graphSize; j++) {
+            if (floyd[j][i] == inf) {
+                continue;
+            }
+            centrality[i] += floyd[j][i];
+        }
+    }
+
+    for (int i = 0; i < graphSize; i++) {
+        delete[] floyd[i];
+    }
+    delete[] floyd;
+
+    return centrality;
 }

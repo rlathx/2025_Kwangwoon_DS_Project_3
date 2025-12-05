@@ -144,6 +144,9 @@ void Manager::run(const char* command_txt) {
             continue;
         }
         if (cmd == "CENTRALITY") {
+            if (!this->mCentrality()) {
+                this->printErrorCode(900);
+            }
         }
         if (cmd == "EXIT") {
         }
@@ -474,7 +477,48 @@ bool Manager::mFLOYD(char option) {
 }
 
 bool Manager::mCentrality() {
-    this->printErrorCode(900);
+    vector<int> centrality = Centrality(this->graph);
+
+    if (centrality.size() == 0) {
+        return false;
+    }
+
+    // When the numerator is the same, the smaller the denominator, the larger the value
+    auto it = min_element(centrality.begin(), centrality.end());
+    int minVal = (*it);
+
+    int graphSize = this->graph->getSize();
+
+    this->fout << "========CENTRALITY========\n";
+
+    for (int i = 0; i < graphSize; i++) {
+        this->fout << " [" << i << "] ";
+
+        if (centrality[i] == 0) {
+            this->fout << "x";
+
+            // If the graph has 1 vertex (graphSize == 1), 0 is Most Central
+            if (graphSize == 1) {
+                this->fout << " <- Most Central";
+            }
+
+            this->fout << "\n";
+
+            continue;
+        }
+
+        this->fout << graphSize - 1 << "/" << centrality[i];
+
+        if (centrality[i] == minVal) {
+            this->fout << " <- Most Central";
+        }
+
+        this->fout << "\n";
+    }
+
+    this->fout << "=======================\n\n";
+
+    return true;
 }
 
 void Manager::printErrorCode(int n) {
