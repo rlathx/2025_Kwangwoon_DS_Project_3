@@ -28,8 +28,6 @@ vector<int> BFS(Graph* graph, char option, int vertex) {
     vector<bool> visit(graph->getSize(), false);
     vector<int> bfs;  // result
 
-    map<int, int> m;  // to, weight
-
     q.push(vertex);
 
     while (!q.empty()) {
@@ -42,6 +40,10 @@ vector<int> BFS(Graph* graph, char option, int vertex) {
         visit[cur] = true;
         bfs.push_back(cur);
 
+        // If you declare it outside the while loop, you have to clear it every time.
+        // Otherwise, the value will accumulate.
+        map<int, int> m;  // to, weight
+
         // Option branch
         if (option == 'O') {
             graph->getAdjacentEdgesDirect(cur, &m);
@@ -52,7 +54,7 @@ vector<int> BFS(Graph* graph, char option, int vertex) {
             return {};
         }
 
-        for (auto it = m.rbegin(); it != m.rend(); it++) {
+        for (auto it = m.begin(); it != m.end(); it++) {
             int end = it->first;
             q.push(end);
         }
@@ -186,6 +188,11 @@ vector<vector<pair<int, int>>> Kruskal(Graph* graph) {
     }
 
     delete[] disjointSet;
+
+    for (int i = 0; i < graphSize; i++) {
+        sort(kruskal[i].begin(), kruskal[i].end());
+    }
+
     return kruskal;
 }
 
@@ -394,10 +401,12 @@ int** FLOYD(Graph* graph, char option) {
         }
     }
 
-    map<int, int> m;  // to, weight
-
     for (int i = 0; i < graphSize; i++) {
         floyd[i][i] = 0;
+
+        // If you declare it outside the while loop, you have to clear it every time.
+        // Otherwise, the value will accumulate.
+        map<int, int> m;  // to, weight
 
         // Option branch
         if (option == 'O') {

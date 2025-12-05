@@ -147,8 +147,14 @@ void Manager::run(const char* command_txt) {
             if (!this->mCentrality()) {
                 this->printErrorCode(900);
             }
+            continue;
         }
         if (cmd == "EXIT") {
+            delete this->graph;
+            this->graph = nullptr;
+
+            this->fout << "========EXIT========\n" << "Success\n" << "=======================\n\n";
+            return;
         }
     }
 
@@ -212,9 +218,10 @@ bool Manager::LOAD(const char* filename) {
                 }
                 to = x;
                 weight = y;
+
+                // Insert an edge into the graph
+                this->graph->insertEdge(current_from, to, weight);
             }
-            // Insert an edge into the graph
-            this->graph->insertEdge(current_from, to, weight);
         }
 
         return true;
@@ -343,7 +350,7 @@ bool Manager::mKRUSKAL() {
     int cost = 0;
     this->fout << "========KRUSKAL========\n";
     for (int i = 0; i < this->graph->getSize(); i++) {
-        this->fout << ' [' << i << ']';
+        this->fout << " [" << i << ']';
         for (int j = 0; j < kruskal[i].size(); j++) {
             int end = kruskal[i][j].first;
             int weight = kruskal[i][j].second;
@@ -380,10 +387,10 @@ bool Manager::mDIJKSTRA(char option, int vertex) {
     this->fout << "Start: " << vertex << '\n';
 
     for (int v = 0; v < this->graph->getSize(); v++) {
-        this->fout << ' [' << v << '] ';
+        this->fout << " [" << v << "] ";
 
         if (dijkstra[v].second == -1) {
-            this->fout << " x\n";
+            this->fout << "x\n";
             continue;
         }
 
@@ -451,18 +458,19 @@ bool Manager::mFLOYD(char option) {
     this->fout << "    ";
 
     for (int i = 0; i < this->graph->getSize(); i++) {
-        this->fout << ' [' << i << '] ';
+        this->fout << " [" << i << "] ";
     }
     this->fout << '\n';
 
     for (int row = 0; row < this->graph->getSize(); row++) {
-        this->fout << ' [' << row << '] ';
+        this->fout << " [" << row << "] ";
 
         for (int col = 0; col < this->graph->getSize(); col++) {
             if (floyd[row][col] == inf) {
                 this->fout << " " << 'x' << "  ";
+            } else {
+                this->fout << " " << floyd[row][col] << "  ";
             }
-            this->fout << " " << floyd[row][col] << "  ";
         }
         this->fout << '\n';
     }

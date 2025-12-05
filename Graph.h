@@ -41,6 +41,7 @@ class Graph {
 
     virtual void insertEdge(int from, int to, int weight) = 0;
     virtual bool printGraph(ofstream* fout) = 0;
+    virtual void clear() = 0;
 };
 
 #endif

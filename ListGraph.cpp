@@ -8,7 +8,7 @@ ListGraph::ListGraph(bool type, int size) : Graph(type, size) {
 }
 
 ListGraph::~ListGraph() {
-    delete[] this->m_List;
+    this->clear();
 }
 
 void ListGraph::getAdjacentEdges(
@@ -79,4 +79,12 @@ bool ListGraph::printGraph(ofstream* fout)  // Definition of print Graph
     (*fout) << "=======================\n\n";
 
     return true;
+}
+
+void ListGraph::clear() {
+    if (this->m_List != nullptr) {
+        delete[] this->m_List;
+    }
+
+    return;
 }

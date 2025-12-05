@@ -12,11 +12,7 @@ MatrixGraph::MatrixGraph(bool type, int size) : Graph(type, size) {
 }
 
 MatrixGraph::~MatrixGraph() {
-    for (int i = 0; i < this->getSize(); i++) {
-        delete[] this->m_Mat[i];
-    }
-
-    delete[] this->m_Mat;
+    this->clear();
 }
 
 void MatrixGraph::getAdjacentEdges(int vertex, map<int, int>* m) {
@@ -62,21 +58,31 @@ bool MatrixGraph::printGraph(ofstream* fout) {
     }
 
     (*fout) << "========PRINT========\n"
-            << "    ";
+            << "     ";
 
     for (int i = 0; i < getSize(); i++) {
-        (*fout) << ' [' << i << '] ';
+        (*fout) << "[" << i << "] ";
     }
     (*fout) << '\n';
 
     for (int row = 0; row < getSize(); row++) {
-        (*fout) << ' [' << row << '] ';
+        (*fout) << " [" << row << "] ";
         for (int col = 0; col < getSize(); col++) {
-            (*fout) << " " << this->m_Mat[row][col] << "  ";
+            (*fout) << " " << this->m_Mat[row][col] << "   ";
         }
         (*fout) << '\n';
     }
     (*fout) << "=======================\n\n";
 
     return true;
+}
+
+void MatrixGraph::clear() {
+    if (this->m_Mat != nullptr) {
+        for (int i = 0; i < this->getSize(); i++) {
+            delete[] this->m_Mat[i];
+        }
+
+        delete[] this->m_Mat;
+    }
 }
