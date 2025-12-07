@@ -28,7 +28,9 @@ void ListGraph::getAdjacentEdges(
         if (u == vertex) continue;
         auto it = this->m_List[u].find(vertex);
         if (it != this->m_List[u].end()) {
-            (*m)[u] = it->second;
+            if (m->find(u) == m->end()) {
+                (*m)[u] = it->second;
+            }
         }
     }
 }

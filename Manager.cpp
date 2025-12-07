@@ -10,7 +10,7 @@
 
 Manager::Manager() {
     graph = nullptr;
-    fout.open("log.txt", ios::app);
+    fout.open("log.txt");
     load = 0;  // Anything is not loaded
 }
 

@@ -124,6 +124,8 @@ vector<vector<pair<int, int>>> Kruskal(Graph* graph) {
     map<int, int> m;                    // (end, weight)
     map<int, pair<int, int>> edgeList;  // key: weight, value: (start, end)
 
+    set<pair<int, int>> pickedEdges;
+
     for (int i = 0; i < graphSize; i++) {
         graph->getAdjacentEdges(i, &m);
         if (m.empty()) {
@@ -137,8 +139,15 @@ vector<vector<pair<int, int>>> Kruskal(Graph* graph) {
             int end = it->first;
             int weight = it->second;
 
-            if (i < end) {
-                edgeList.insert({weight, make_pair(i, end)});
+            int u = i;
+            int v = end;
+            if (u > v) swap(u, v);
+
+            // Using set, we can check for duplicates and collect edges that only have information
+            // on the lower triangle.
+            if (pickedEdges.find({u, v}) == pickedEdges.end()) {
+                edgeList.insert({weight, {u, v}});
+                pickedEdges.insert({u, v});
             }
         }
     }

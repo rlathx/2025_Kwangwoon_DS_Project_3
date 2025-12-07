@@ -19,16 +19,15 @@ void MatrixGraph::getAdjacentEdges(int vertex, map<int, int>* m) {
     m->clear();
 
     for (int u = 0; u < this->getSize(); u++) {
-        if (u == vertex) {
-            continue;
-        }
-        int weight1 = this->m_Mat[vertex][u];  // out edges
-        int weight2 = this->m_Mat[u][vertex];  // in edges
+        if (u == vertex) continue;
 
+        int weight1 = this->m_Mat[vertex][u];  // out
+        int weight2 = this->m_Mat[u][vertex];  // in
+
+        // Insert weight if there is an edge in at least one direction
         if (weight1 != 0) {
             (*m)[u] = weight1;
-        }
-        if (weight2 != 0) {
+        } else if (weight2 != 0) {
             (*m)[u] = weight2;
         }
     }
